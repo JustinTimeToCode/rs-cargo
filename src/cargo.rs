@@ -1,13 +1,7 @@
-use ascii::AsciiChar;
 pub mod cargo {
+    use std::fs::File;
 
-    /*
-     * Type used to represent an input character.  It is intended to
-     * represent a Unicode code point (4 bytes max), so the C type
-     * "char" is not used.  It is signed, so that we can represent
-     * the out-of-band value EOF (-1) as a value of this type.
-     */
-    type CargoChar = i32;
+    use ascii::AsciiChar;
 
     #[derive(Debug)]
     enum CargoValueType {
@@ -33,32 +27,32 @@ pub mod cargo {
     const CARGO_FALSE_TOKEN: &str = "false";
     const CARGO_NULL_TOKEN: &str = "null";
 
-    const CARGO_COLON: char = AsciiChar::Colon;
-    const CARGO_LBRACE: char = AsciiChar::CurlyBraceOpen;
-    const CARGO_RBRACE: char = AsciiChar::CurlyBraceClose;
-    const CARGO_LBRACK: char = AsciiChar::BracketOpen;
-    const CARGO_RBRACK: char = AsciiChar::BracketClose;
-    const CARGO_QUOTE: char = AsciiChar::Quotation;
-    const CARGO_BSLASH: char = AsciiChar::BackSlash;
-    const CARGO_FSLASH: char = AsciiChar::Slash;
-    const CARGO_COMMA: char = AsciiChar::Comma;
-    const CARGO_PERIOD: char = AsciiChar::Dot;
-    const CARGO_PLUS: char = AsciiChar::Plus;
-    const CARGO_MINUS: char = AsciiChar::Minus;
-    const CARGO_DIGIT0: char = AsciiChar::_0;
-    const CARGO_B: char = AsciiChar::b;
-    const CARGO_E: char = AsciiChar::e;
-    const CARGO_F: char = AsciiChar::f;
-    const CARGO_N: char = AsciiChar::n;
-    const CARGO_R: char = AsciiChar::r;
-    const CARGO_T: char = AsciiChar::t;
-    const CARGO_U: char = AsciiChar::u;
-    const CARGO_BS: char = AsciiChar::BackSpace;
-    const CARGO_FF: char = AsciiChar::FF;
-    const CARGO_LF: char = AsciiChar::LineFeed;
-    const CARGO_CR: char = AsciiChar::CarriageReturn;
-    const CARGO_HT: char = AsciiChar::Tab;
-    const CARGO_SPACE: char = AsciiChar::Space;
+    const CARGO_COLON: char = AsciiChar::Colon.as_char();
+    const CARGO_LBRACE: char = AsciiChar::CurlyBraceOpen.as_char();
+    const CARGO_RBRACE: char = AsciiChar::CurlyBraceClose.as_char();
+    const CARGO_LBRACK: char = AsciiChar::BracketOpen.as_char();
+    const CARGO_RBRACK: char = AsciiChar::BracketClose.as_char();
+    const CARGO_QUOTE: char = AsciiChar::Quotation.as_char();
+    const CARGO_BSLASH: char = AsciiChar::BackSlash.as_char();
+    const CARGO_FSLASH: char = AsciiChar::Slash.as_char();
+    const CARGO_COMMA: char = AsciiChar::Comma.as_char();
+    const CARGO_PERIOD: char = AsciiChar::Dot.as_char();
+    const CARGO_PLUS: char = AsciiChar::Plus.as_char();
+    const CARGO_MINUS: char = AsciiChar::Minus.as_char();
+    const CARGO_DIGIT0: char = AsciiChar::_0.as_char();
+    const CARGO_B: char = AsciiChar::b.as_char();
+    const CARGO_E: char = AsciiChar::e.as_char();
+    const CARGO_F: char = AsciiChar::f.as_char();
+    const CARGO_N: char = AsciiChar::n.as_char();
+    const CARGO_R: char = AsciiChar::r.as_char();
+    const CARGO_T: char = AsciiChar::t.as_char();
+    const CARGO_U: char = AsciiChar::u.as_char();
+    const CARGO_BS: char = AsciiChar::BackSpace.as_char();
+    const CARGO_FF: char = AsciiChar::FF.as_char();
+    const CARGO_LF: char = AsciiChar::LineFeed.as_char();
+    const CARGO_CR: char = AsciiChar::CarriageReturn.as_char();
+    const CARGO_HT: char = AsciiChar::Tab.as_char();
+    const CARGO_SPACE: char = AsciiChar::Space.as_char();
 
     /*
      * Structure used to hold a string value.
@@ -73,11 +67,15 @@ pub mod cargo {
     struct CargoString {
         capacity: usize,
         length: usize,
-        content: &str,
+        content: String,
     }
 
     impl CargoString {
-        fn append_char(c: CargoChar) {}
+        fn append_char(&mut self, c: char) {
+            self.content.push(c);
+            self.length += 1;
+        }
+        fn write_string(&self, file: File) {}
     }
 
     /*
@@ -108,6 +106,10 @@ pub mod cargo {
         valid_string: char,
         valid_int: char,
         valid_float: char,
+    }
+
+    impl CargoNumber {
+        fn write_number(&self, file: File) {}
     }
 
     /*
@@ -169,12 +171,14 @@ pub mod cargo {
     #[derive(Debug)]
     struct CargoValue {
         cargo_type: CargoValueType,
-        next: CargoValue,
-        prev: CargoValue,
+        next: Box<CargoValue>,
+        prev: Box<CargoValue>,
         name: CargoString,
     }
 
-    impl CargoValue {}
+    impl CargoValue {
+        fn write_value(&self, file: File) {}
+    }
 
     fn cargo_is_whitespace(c: char) -> bool {
         c == CARGO_SPACE || c == CARGO_LF || c == CARGO_CR || c == CARGO_HT

@@ -1,3 +1,4 @@
+mod cargo;
 use clap::{Args, Parser, Subcommand};
 
 #[derive(Debug, Parser)]
